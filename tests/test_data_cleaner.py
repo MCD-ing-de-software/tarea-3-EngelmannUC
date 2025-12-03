@@ -119,6 +119,7 @@ class TestDataCleaner(unittest.TestCase):
         - Verificar que las columnas no especificadas (ej: "city") permanecen sin cambios (si comparas Series completas, usar pandas.testing.assert_series_equal() ya que maneja mejor los índices y tipos de Pandas; si comparas valores individuales, self.assertEqual es suficiente)
         """
         df = make_sample_df()
+        df["name"] = df["name"].astype(str)
         cleaner = DataCleaner()
         
         result = cleaner.trim_strings(df, ["name"])
@@ -157,7 +158,7 @@ class TestDataCleaner(unittest.TestCase):
         df = make_sample_df()
         cleaner = DataCleaner()
 
-        result = cleaner.remove_outliers_iqr(df, ["age"], 1.5)
+        result = cleaner.remove_outliers_iqr(df, "age", 1.5)
 
         self.assertNotIn(120, result["age"])
         self.assertIn(25, result["age"])
@@ -175,7 +176,7 @@ class TestDataCleaner(unittest.TestCase):
         cleaner = DataCleaner()
 
         with self.assertRaises(KeyError):
-            cleaner.remove_outliers_iqr(df, ["salary"], 1.5)
+            cleaner.remove_outliers_iqr(df, "salary", 1.5)
 
     def test_remove_outliers_iqr_raises_typeerror_for_non_numeric_column(self):
         """Test que verifica que el método remove_outliers_iqr lanza un TypeError cuando
@@ -190,7 +191,7 @@ class TestDataCleaner(unittest.TestCase):
         cleaner = DataCleaner()
 
         with self.assertRaises(TypeError):
-            cleaner.remove_outliers_iqr(df, ["city"], 1.5)
+            cleaner.remove_outliers_iqr(df, "city", 1.5)
 
 if __name__ == "__main__":
     unittest.main()
